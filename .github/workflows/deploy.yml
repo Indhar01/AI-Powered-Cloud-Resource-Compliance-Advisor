@@ -1,1 +1,41 @@
 # GitHub Actions CI/CD Workflow
+
+name: Deploy to Local k3s
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'backend/**'       # Only run if backend code changes
+      - 'k8s/apps/**'      # Or if k8s configs change
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted   # <--- Runs inside your WSL
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Build Docker Image
+      run: |
+        echo "Building image..."
+        cd backend
+        docker build -t my-app:latest .
+
+    - name: Import to k3s
+      run: |
+        echo "Importing image into k3s..."
+        # We export the image and pipe it directly into k3s's containerd
+        docker save my-app:latest | k3s ctr images import -
+
+    - name: Restart Deployment
+      run: |
+        echo "Restarting pods to pick up new code..."
+        # Force a rollout restart so it pulls the 'latest' image we just imported
+        kubectl rollout restart deployment/api-server
+        kubectl rollout restart deployment/celery-worker
+        
+    - name: Verify
+      run: |
+        kubectl rollout status deployment/api-server
