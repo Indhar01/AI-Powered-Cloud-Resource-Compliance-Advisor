@@ -27,7 +27,7 @@ jobs:
       run: |
         echo "Importing image into k3s..."
         # We export the image and pipe it directly into k3s's containerd
-        docker save my-app:latest | k3s ctr images import -
+        sudo docker save my-app:latest | sudo k3s ctr images import -
 
     - name: Restart Deployment
       run: |
