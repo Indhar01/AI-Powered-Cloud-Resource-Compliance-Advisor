@@ -47,6 +47,7 @@ def login():
 @app.route('/submit-resource', methods=['POST'])
 @jwt_required()
 def submit_resource():
+    print("🚀 CI/CD DEPLOYMENT SUCCESSFUL! Processing request...")
     try:
         req_data = ResourceRequest(**request.json)
     except ValidationError as e:
