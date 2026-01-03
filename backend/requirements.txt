@@ -1,0 +1,9 @@
+flask
+flask-cors
+flask-jwt-extended
+celery
+redis
+sqlalchemy
+psycopg2-binary
+pydantic
+email-validator
