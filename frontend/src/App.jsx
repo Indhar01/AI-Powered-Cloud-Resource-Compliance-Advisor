@@ -6,8 +6,8 @@ function App() {
   // --- CONFIGURATION ---
   // If accessing via Ingress (Day 10+): Use "http://localhost/api"
   // If accessing via Port-Forward (Day 3-9): Use "http://localhost:5000"
-  // const API_URL = "http://localhost/api" 
-  const API_URL = "http://localhost:5000"
+  const API_URL = "http://localhost/api" 
+  // const API_URL = "http://localhost:5000"
   
   // --- STATE ---
   const [token, setToken] = useState(localStorage.getItem('token') || "")
