@@ -6,6 +6,7 @@ import json
 from celery import Celery
 from sqlalchemy import create_engine, Column, Integer, String, Text
 from sqlalchemy.orm import sessionmaker, declarative_base
+import time
 
 # Environment Variables (Defaults for K8s)
 DB_URL = os.getenv("DATABASE_URL", "postgresql://postgres:password123@postgres.infra:5432/postgres")
@@ -40,8 +41,16 @@ def provision_resource(task_id):
         session.commit()
 
         # Simulate Terraform/Cloud Provisioning
-        time.sleep(10) 
+        # time.sleep(10) 
 
+        # print(f"[Worker] Task {task_id} Completed.")
+        # task.status = "COMPLETED"
+        # session.commit()
+
+        end_time = time.time() + 15 
+        while time.time() < end_time:
+            _ = [x * x for x in range(10000)] # Burns CPU
+        
         print(f"[Worker] Task {task_id} Completed.")
         task.status = "COMPLETED"
         session.commit()

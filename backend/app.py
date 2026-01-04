@@ -9,12 +9,23 @@ from pydantic import BaseModel, ValidationError
 from typing import Dict, List
 from tasks import provision_resource, TaskLog, SessionLocal
 from compliance import ComplianceAdvisor
+from prometheus_client import Counter, generate_latest
 
 app = Flask(__name__)
 CORS(app)
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "local-dev-secret")
 jwt = JWTManager(app)
 advisor = ComplianceAdvisor()
+
+JOB_COUNTER = Counter('infra_jobs_submitted_total', 'Total number of infrastructure jobs submitted')
+
+@app.route('/health', methods=['GET']) # <--- NEW: Liveness Probe
+def health_check():
+    return jsonify({"status": "healthy"}), 200
+
+@app.route('/metrics', methods=['GET']) # <--- NEW: Prometheus Endpoint
+def metrics():
+    return generate_latest(), 200
 
 # Pydantic Models
 class SecurityGroup(BaseModel):
@@ -52,6 +63,8 @@ def submit_resource():
         req_data = ResourceRequest(**request.json)
     except ValidationError as e:
         return jsonify(e.errors()), 422
+    
+    JOB_COUNTER.inc()
 
     # Run Compliance Check
     audit = advisor.evaluate(req_data.dict())
