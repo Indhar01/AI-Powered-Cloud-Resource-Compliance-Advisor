@@ -36,7 +36,7 @@ def provision_resource(task_id):
     task = session.query(TaskLog).filter(TaskLog.id == task_id).first()
     
     if task:
-        print(f"[Worker] Processing Task {task_id}...")
+        print(f"[Worker] Processing Task {task_id}..")
         task.status = "PROCESSING"
         session.commit()
 
